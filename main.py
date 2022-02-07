@@ -1,65 +1,108 @@
 import pygame
-import time
 import random
 from pygame import mixer
 
-# Pygame font initialize
+# Pygame init
 pygame.font.init()
-# Required line
 pygame.init()
+main_font = pygame.font.SysFont("comicsans", 25)
 
-# Creating screen
-width = 1200
-height = 1000
+# window screen
+width = 800
+height = 600
+
 WIN = pygame.display.set_mode((width, height))
 
-# BG image & music
-BG = pygame.image.load('GameFiles/background.jpg')
-#mixer.music.load('GameSounds/red.mp3')
-#mixer.music.play(-1)
+# Program window info
 
-# title and icon
 pygame.display.set_caption("Simon Game")
-icon = pygame.image.load('GameFiles/icon.png')
-pygame.display.set_icon(icon)
+pygame.display.set_icon(pygame.image.load('GameFiles/icon.png'))
 
-# Buttons
-BLUE = pygame.image.load('GameFiles/blue.png')
-BLUELIT = pygame.image.load('GameFiles/blue1.png')
-GREEN = pygame.image.load('GameFiles/green.png')
-GREENLIT = pygame.image.load('GameFiles/green1.png')
-RED = pygame.image.load('GameFiles/red.png')
-REDLIT = pygame.image.load('GameFiles/red1.png')
-YELLOW = pygame.image.load('GameFiles/yellow.png')
-YELLOWLIT = pygame.image.load('GameFiles/yellow1.png')
+# Loading buttons and sounds
+
+BUTTONS = [
+    pygame.image.load('GameFiles/blue.png').convert_alpha(),
+    pygame.image.load('GameFiles/green.png').convert_alpha(),
+    pygame.image.load('GameFiles/red.png').convert_alpha(),
+    pygame.image.load('GameFiles/yellow.png').convert_alpha()
+]
+
+BUTTONS_LIT = [
+    pygame.image.load('GameFiles/blue1.png'),
+    pygame.image.load('GameFiles/green1.png'),
+    pygame.image.load('GameFiles/red1.png'),
+    pygame.image.load('GameFiles/yellow1.png')
+]
+
+SOUNDS = [
+    mixer.Sound('GameSounds/blue.mp3'),
+    mixer.Sound('GameSounds/green.mp3'),
+    mixer.Sound('GameSounds/red.mp3'),
+    mixer.Sound('GameSounds/yellow.mp3'),
+    mixer.Sound('GameSounds/wrong.mp3')
+]
+
+POS = [
+    (width / 2 - BUTTONS[0].get_width() - 5, height / 2 - BUTTONS[0].get_height() + 15),
+    (width / 2 + 5, height / 2 - BUTTONS[1].get_height() + 15),
+    (width / 2 - BUTTONS[3].get_width() - 5, height / 2 + 25),
+    (width / 2 + 5, height / 2 + 25)
+]
+# Function to lit buttons
 
 
-def redlit():
-    redsound = mixer.Sound('GameSounds/red.mp3')
-    redsound.play()
-    WIN.blit(REDLIT, (width / 2 - RED.get_width() - 5, height / 2 - RED.get_height() + 15))
+def onclick(clicked1):
+    WIN.blit(BUTTONS_LIT[clicked1], POS[clicked1])
+    SOUNDS[clicked1].play()
+    pygame.display.update()
+    pygame.time.delay(200)
+
+
+def redraw():
+    WIN.fill((25, 25, 25))
+    start = main_font.render("Press <ANY_KEY> to start the game", 1, (255, 0, 0))
+    level = main_font.render(f"Level: {len(genclick)}", 1, (255, 0, 0))
+    WIN.blit(start, (width / 2 - start.get_width() / 2, 0))
+    WIN.blit(level, (width / 2 - level.get_width() / 2, 40))
+    WIN.blit(BUTTONS[0], POS[0])
+    WIN.blit(BUTTONS[1], POS[1])
+    WIN.blit(BUTTONS[2], POS[2])
+    WIN.blit(BUTTONS[3], POS[3])
     pygame.display.update()
 
 
-def bluelit():
-    bluesound = mixer.Sound('GameSounds/blue.mp3')
-    bluesound.play()
-    WIN.blit(BLUELIT, (width / 2 + 5, height / 2 - BLUE.get_height() + 15))
-    pygame.display.update()
+genclick = []
+clicked = []
 
 
-def yellowlit():
-    yellowsound = mixer.Sound('GameSounds/yellow.mp3')
-    yellowsound.play()
-    WIN.blit(YELLOWLIT, (width / 2 - YELLOW.get_width() - 5, height / 2 + 25))
-    pygame.display.update()
+def game():
+    redraw()
+    pygame.time.delay(500)
+    gen = random.randint(1, 4)
+    if gen == 1:
+        onclick(0)
+        genclick.append(0)
+    if gen == 2:
+        onclick(1)
+        genclick.append(1)
+    if gen == 3:
+        onclick(2)
+        genclick.append(2)
+    if gen == 4:
+        onclick(3)
+        genclick.append(3)
 
 
-def greenlit():
-    greensound = mixer.Sound('GameSounds/green.mp3')
-    greensound.play()
-    WIN.blit(GREENLIT, (width / 2 + 5, height / 2 + 20 + 5))
-    pygame.display.update()
+def check_game():
+    if clicked[-1] == genclick[len(clicked) - 1]:
+        if len(clicked) == len(genclick):
+            game()
+            clicked.clear()
+    else:
+        print("You failed")
+        clicked.clear()
+        genclick.clear()
+        SOUNDS[4].play()
 
 
 def main():
@@ -67,108 +110,51 @@ def main():
     FPS = 60
     clock = pygame.time.Clock()
     clock.tick(FPS)
-    main_font = pygame.font.SysFont("comicsans", 25)
-    answers = []
-    clicks = []
-
-    def redraw_window():
-        WIN.fill((25, 25, 25))
-        # Draw text
-        start = main_font.render("Press <ANY_KEY> to start the game", 1, (255, 0, 0))
-        level = main_font.render(f"Level: {len(answers)}", 1, (255, 0, 0))
-        WIN.blit(start, (width / 2 - start.get_width() / 2, 0))
-        WIN.blit(level, (width / 2 - level.get_width() / 2, 40))
-        WIN.blit(RED, (width / 2 - RED.get_width() - 5, height / 2 - RED.get_height() + 20 - 5))
-        WIN.blit(BLUE, (width / 2 + 5, height / 2 - BLUE.get_height() + 20 - 5))
-        WIN.blit(YELLOW, (width / 2 - YELLOW.get_width() - 5, height / 2 + 20 + 5))
-        WIN.blit(GREEN, (width / 2 + 5, height / 2 + 20 + 5))
-        pygame.display.update()
-
-    def start_game():
-        generator = random.randint(1, 4)
-        if generator == 1:
-            redraw_window()
-            redlit()
-            pygame.display.update()
-            answers.append(1)
-            time.sleep(1)
-        elif generator == 2:
-            redraw_window()
-            bluelit()
-            pygame.display.update()
-            answers.append(2)
-            time.sleep(1)
-        elif generator == 3:
-            redraw_window()
-            yellowlit()
-            pygame.display.update()
-            answers.append(3)
-            time.sleep(1)
-        elif generator == 4:
-            redraw_window()
-            greenlit()
-            pygame.display.update()
-            answers.append(4)
-            time.sleep(1)
-
-    def check():
-        if clicks[-1] == answers[len(clicks) - 1]:
-            if len(clicks) == len(answers):
-                time.sleep(1)
-                start_game()
-                clicks.clear()
-        else:
-            print("You failed")
-            clicks.clear()
-            answers.clear()
-            failsound = mixer.Sound('GameSounds/wrong.mp3')
-            failsound.play()
-
+    mask = pygame.mask.from_surface(BUTTONS[0])
+    mask1 = pygame.mask.from_surface(BUTTONS[1])
     while run:
-        try:
-            clock.tick(FPS)
-            redraw_window()
-            mouse = pygame.mouse.get_pos()
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
+        redraw()
 
-                if event.type == pygame.KEYDOWN:
-                    clicks.clear()
-                    answers.clear()
-                    start_game()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+            if event.type == pygame.KEYDOWN:
+                clicked.clear()
+                genclick.clear()
+                game()
 
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if width / 2 - RED.get_width() - 5 <= mouse[0] <= width / 2 - 5 and\
-                            height / 2 - RED.get_height() + 20 - 5 <= mouse[1] <= height / 2 + 15:
-                        redlit()
-                        redraw_window()
-                        clicks.append(1)
-                        check()
-                        redraw_window()
-                    if width / 2 + 5 <= mouse[0] <= width / 2 + BLUE.get_width() + 5 and\
-                            height / 2 - BLUE.get_height() + 15 <= mouse[1] <= height / 2 + 15:
-                        bluelit()
-                        redraw_window()
-                        clicks.append(2)
-                        check()
-                        redraw_window()
-                    if width / 2 - YELLOW.get_width() - 5 <= mouse[0] <= width / 2 - 5 and\
-                            height / 2 + 25 <= mouse[1] <= height / 2 + YELLOW.get_height() + 25:
-                        yellowlit()
-                        redraw_window()
-                        clicks.append(3)
-                        check()
-                        redraw_window()
-                    if width / 2 + 5 <= mouse[0] <= width / 2 + GREEN.get_width() + 5 and\
-                            height / 2 + 25 <= mouse[1] <= height / 2 + GREEN.get_height() + 25:
-                        greenlit()
-                        redraw_window()
-                        clicks.append(4)
-                        check()
-                        redraw_window()
-        except IndexError:
-            continue
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                try:
+                    if mask.get_at((event.pos[0] - POS[0][0], event.pos[1] - POS[0][1])):
+                        onclick(0)
+                        clicked.append(0)
+                        check_game()
+                except IndexError:
+                    pass
+
+                try:
+                    if mask1.get_at((event.pos[0] - POS[1][0], event.pos[1] - POS[1][1])):
+                        onclick(1)
+                        clicked.append(1)
+                        check_game()
+                except IndexError:
+                    pass
+
+                try:
+                    if mask1.get_at((event.pos[0] - POS[2][0], event.pos[1] - POS[2][1])):
+                        onclick(2)
+                        clicked.append(2)
+                        check_game()
+                except IndexError:
+                    pass
+
+                try:
+                    if mask1.get_at((event.pos[0] - POS[3][0], event.pos[1] - POS[3][1])):
+                        onclick(3)
+                        clicked.append(3)
+                        check_game()
+                except IndexError:
+                    pass
 
 main()
-
