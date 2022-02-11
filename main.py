@@ -111,7 +111,6 @@ def main():
     clock = pygame.time.Clock()
     clock.tick(FPS)
     mask = pygame.mask.from_surface(BUTTONS[0])
-    mask1 = pygame.mask.from_surface(BUTTONS[1])
     while run:
         redraw()
 
@@ -134,7 +133,7 @@ def main():
                     pass
 
                 try:
-                    if mask1.get_at((event.pos[0] - POS[1][0], event.pos[1] - POS[1][1])):
+                    if mask.get_at((event.pos[0] - POS[1][0], event.pos[1] - POS[1][1])):
                         onclick(1)
                         clicked.append(1)
                         check_game()
@@ -142,7 +141,7 @@ def main():
                     pass
 
                 try:
-                    if mask1.get_at((event.pos[0] - POS[2][0], event.pos[1] - POS[2][1])):
+                    if mask.get_at((event.pos[0] - POS[2][0], event.pos[1] - POS[2][1])):
                         onclick(2)
                         clicked.append(2)
                         check_game()
@@ -150,7 +149,7 @@ def main():
                     pass
 
                 try:
-                    if mask1.get_at((event.pos[0] - POS[3][0], event.pos[1] - POS[3][1])):
+                    if mask.get_at((event.pos[0] - POS[3][0], event.pos[1] - POS[3][1])):
                         onclick(3)
                         clicked.append(3)
                         check_game()
